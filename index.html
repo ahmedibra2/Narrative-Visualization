@@ -170,7 +170,7 @@
       // Explanation Paragraph
       svg.append("text")
         .attr("class", "annotation")
-        .attr("x", width - margin.right + 50)
+        .attr("x", width - margin.right)
         .attr("y", height / 2 - 30)           
         .attr("text-anchor", "start")
         .selectAll("tspan")
@@ -183,7 +183,7 @@
           "electric vehicles."
         ])
         .join("tspan")
-        .attr("x", width - margin.right + 50)
+        .attr("x", width - margin.right)
         .attr("dy", "1.2em")                 
         .text(d => d);
     
