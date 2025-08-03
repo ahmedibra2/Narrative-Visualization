@@ -150,7 +150,6 @@
         .attr("x", -height / 2)
         .attr("y", 20)
         .attr("text-anchor", "middle")
-        .attr("font-size", "14px")
         .text("Average MPG");
       
       // X-axis title
@@ -158,7 +157,6 @@
         .attr("x", width / 2)
         .attr("y", height - 30)
         .attr("text-anchor", "middle")
-        .attr("font-size", "14px")
         .text("Number of Engine Cylinders");
       
       // Title
@@ -215,12 +213,14 @@
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
     
+      // X-axis title
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height - 10)
         .attr("text-anchor", "middle")
         .text("Average City MPG");
     
+      // Y-axis title
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -236,13 +236,21 @@
         .attr("r", 5)
         .attr("fill", d => color(d.EngineCylinders))
         .attr("opacity", 0.7);
-    
+
+      // Title
       svg.append("text")
         .attr("x", width / 2)
-        .attr("y", margin.top)
+        .attr("y", margin.top / 2)
         .attr("text-anchor", "middle")
-        .attr("class", "annotation")
+        .attr("font-size", "20px")
         .text("City vs Highway MPG colored by engine cylinder count.");
+    
+      // svg.append("text")
+      //   .attr("x", width / 2)
+      //   .attr("y", margin.top)
+      //   .attr("text-anchor", "middle")
+      //   .attr("class", "annotation")
+      //   .text("City vs Highway MPG colored by engine cylinder count.");
     
       const legend = svg.selectAll(".legend")
         .data(uniqueCylinders)
@@ -311,7 +319,6 @@
         .attr("x", -height / 2)
         .attr("y", 20)
         .attr("text-anchor", "middle")
-        .attr("font-size", "14px")
         .text("Average MPG");
     
       svg.selectAll("rect")
@@ -322,13 +329,21 @@
         .attr("width", x.bandwidth())
         .attr("height", d => y(0) - y(d.value))
         .attr("fill", d => d.type === "AverageCityMPG" ? "teal" : "purple");
-    
+
+      // Title
       svg.append("text")
         .attr("x", width / 2)
-        .attr("y", margin.top)
+        .attr("y", margin.top / 2)
         .attr("text-anchor", "middle")
-        .attr("class", "annotation")
+        .attr("font-size", "20px")
         .text("City and highway MPG vary between models from the same manufacturer.");
+    
+      // svg.append("text")
+      //   .attr("x", width / 2)
+      //   .attr("y", margin.top)
+      //   .attr("text-anchor", "middle")
+      //   .attr("class", "annotation")
+      //   .text("City and highway MPG vary between models from the same manufacturer.");
     }
 
   </script>
