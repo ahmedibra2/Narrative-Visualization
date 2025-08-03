@@ -275,51 +275,90 @@
       else if (sceneNumber === 2) drawScene2();
       else if (sceneNumber === 3) drawScene3();
     }
-
+    
     function drawScene1() {
       const svg = d3.select("#vis")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
-
-      const makes = Array.from(new Set(data.map(d => d.Make)));
-
-      const mpgByMake = makes.map(make => {
-        const entries = data.filter(d => d.Make === make);
-        return {
-          Make: make,
-          Highway: d3.mean(entries, d => d.AverageHighwayMPG),
-          City: d3.mean(entries, d => d.AverageCityMPG)
-        };
+    
+      const fuelGroups = d3.group(data, d => d.Fuel);
+      const fuels = Array.from(fuelGroups.keys());
+    
+      const summary = fuels.map(fuel => {
+        const mpgs = fuelGroups.get(fuel).map(d => +d.AverageCityMPG).sort(d3.ascending);
+        const q1 = d3.quantile(mpgs, 0.25);
+        const median = d3.quantile(mpgs, 0.5);
+        const q3 = d3.quantile(mpgs, 0.75);
+        const iqr = q3 - q1;
+        const min = d3.min(mpgs.filter(d => d >= q1 - 1.5 * iqr));
+        const max = d3.max(mpgs.filter(d => d <= q3 + 1.5 * iqr));
+        return { fuel, q1, median, q3, iqr, min, max };
       });
-
-      const x = d3.scaleBand().domain(mpgByMake.map(d => d.Make)).range([margin.left, width - margin.right]).padding(0.2);
-      const y = d3.scaleLinear().domain([0, d3.max(mpgByMake, d => d.Highway)]).nice().range([height - margin.bottom, margin.top]);
-
+    
+      const x = d3.scaleBand()
+        .domain(fuels)
+        .range([margin.left, width - margin.right])
+        .padding(0.4);
+    
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(summary, d => d.max)]).nice()
+        .range([height - margin.bottom, margin.top]);
+    
       svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x));
-
+    
       svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
-
-      svg.selectAll(".bar")
-        .data(mpgByMake)
+    
+      svg.selectAll(".box")
+        .data(summary)
         .join("rect")
-        .attr("x", d => x(d.Make))
-        .attr("y", d => y(d.Highway))
+        .attr("x", d => x(d.fuel))
+        .attr("y", d => y(d.q3))
+        .attr("height", d => y(d.q1) - y(d.q3))
         .attr("width", x.bandwidth())
-        .attr("height", d => y(0) - y(d.Highway))
-        .attr("fill", "steelblue");
-
+        .attr("stroke", "black")
+        .attr("fill", "lightblue");
+    
+      svg.selectAll(".median")
+        .data(summary)
+        .join("line")
+        .attr("x1", d => x(d.fuel))
+        .attr("x2", d => x(d.fuel) + x.bandwidth())
+        .attr("y1", d => y(d.median))
+        .attr("y2", d => y(d.median))
+        .attr("stroke", "black");
+    
+      svg.selectAll(".min-line")
+        .data(summary)
+        .join("line")
+        .attr("x1", d => x(d.fuel) + x.bandwidth() / 2)
+        .attr("x2", d => x(d.fuel) + x.bandwidth() / 2)
+        .attr("y1", d => y(d.min))
+        .attr("y2", d => y(d.q1))
+        .attr("stroke", "black");
+    
+      svg.selectAll(".max-line")
+        .data(summary)
+        .join("line")
+        .attr("x1", d => x(d.fuel) + x.bandwidth() / 2)
+        .attr("x2", d => x(d.fuel) + x.bandwidth() / 2)
+        .attr("y1", d => y(d.q3))
+        .attr("y2", d => y(d.max))
+        .attr("stroke", "black");
+    
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", margin.top)
         .attr("text-anchor", "middle")
         .attr("class", "annotation")
-        .text("Most fuel-efficient makes in 2017 had smaller engines.");
+        .text("Fuel type affects city MPG: Electricity and hybrids generally perform better.");
     }
+
+
 
     // function drawScene2() {
     //   const svg = d3.select("#vis")
