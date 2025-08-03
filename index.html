@@ -321,37 +321,116 @@
         .text("Most fuel-efficient makes in 2017 had smaller engines.");
     }
 
+    // function drawScene2() {
+    //   const svg = d3.select("#vis")
+    //     .append("svg")
+    //     .attr("width", width)
+    //     .attr("height", height);
+
+    //   const x = d3.scaleLinear().domain([2, 14]).range([margin.left, width - margin.right]);
+    //   const y = d3.scaleLinear().domain([10, 40]).range([height - margin.bottom, margin.top]);
+
+    //   svg.append("g")
+    //     .attr("transform", `translate(0,${height - margin.bottom})`)
+    //     .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format("d")));
+
+    //   svg.append("g")
+    //     .attr("transform", `translate(${margin.left},0)`)
+    //     .call(d3.axisLeft(y));
+
+    //   svg.selectAll("circle")
+    //     .data(data)
+    //     .join("circle")
+    //     .attr("cx", d => x(d.EngineCylinders))
+    //     .attr("cy", d => y(d.AverageHighwayMPG))
+    //     .attr("r", 5)
+    //     .attr("fill", "orange");
+
+    //   svg.append("text")
+    //     .attr("x", width / 2)
+    //     .attr("y", margin.top)
+    //     .attr("text-anchor", "middle")
+    //     .attr("class", "annotation")
+    //     .text("Higher cylinder count tends to reduce highway efficiency.");
+    // }
+
     function drawScene2() {
       const svg = d3.select("#vis")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
-
-      const x = d3.scaleLinear().domain([2, 14]).range([margin.left, width - margin.right]);
-      const y = d3.scaleLinear().domain([10, 40]).range([height - margin.bottom, margin.top]);
-
+    
+      const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.AverageCityMPG))
+        .nice()
+        .range([margin.left, width - margin.right]);
+    
+      const y = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.AverageHighwayMPG))
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+    
+      const uniqueCylinders = Array.from(new Set(data.map(d => d.EngineCylinders))).sort((a, b) => a - b);
+    
+      const color = d3.scaleOrdinal()
+        .domain(uniqueCylinders)
+        .range(d3.schemeCategory10);
+    
       svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format("d")));
-
+        .call(d3.axisBottom(x));
+    
       svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
-
+    
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height - 10)
+        .attr("text-anchor", "middle")
+        .text("Average City MPG");
+    
+      svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", 20)
+        .attr("text-anchor", "middle")
+        .text("Average Highway MPG");
+    
       svg.selectAll("circle")
         .data(data)
         .join("circle")
-        .attr("cx", d => x(d.EngineCylinders))
+        .attr("cx", d => x(d.AverageCityMPG))
         .attr("cy", d => y(d.AverageHighwayMPG))
         .attr("r", 5)
-        .attr("fill", "orange");
-
+        .attr("fill", d => color(d.EngineCylinders))
+        .attr("opacity", 0.7);
+    
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", margin.top)
         .attr("text-anchor", "middle")
         .attr("class", "annotation")
-        .text("Higher cylinder count tends to reduce highway efficiency.");
+        .text("City vs Highway MPG colored by engine cylinder count.");
+    
+      const legend = svg.selectAll(".legend")
+        .data(uniqueCylinders)
+        .join("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => `translate(0,${margin.top + i * 20})`);
+    
+      legend.append("rect")
+        .attr("x", width - margin.right - 18)
+        .attr("width", 12)
+        .attr("height", 12)
+        .attr("fill", d => color(d));
+    
+      legend.append("text")
+        .attr("x", width - margin.right - 24)
+        .attr("y", 6)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "end")
+        .text(d => `${d} cylinders`);
     }
 
     function drawScene3() {
