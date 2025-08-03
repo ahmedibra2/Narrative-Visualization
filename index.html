@@ -257,12 +257,14 @@
 
     function populateMakeSelector() {
       const selector = d3.select("#makeSelector");
-      const makes = Array.from(new Set(data.map(d => d.Make)));
+      const makes = Array.from(new Set(data.map(d => d.Make))).sort();
       selector.selectAll("option")
         .data(makes)
         .join("option")
         .text(d => d)
         .attr("value", d => d);
+    
+      selector.property("value", makes[0]);
     }
 
     function setScene(sceneNumber) {
@@ -353,42 +355,56 @@
     }
 
     function drawScene3() {
-      updateScene3(); // draws chart for selected make
+      updateScene3();
     }
 
     function updateScene3() {
       d3.select("#vis").html("");
       const selectedMake = d3.select("#makeSelector").property("value");
       const filtered = data.filter(d => d.Make === selectedMake);
-
+    
+      if (filtered.length === 0) return;
+    
       const svg = d3.select("#vis")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
-
+    
       const mpgTypes = ["AverageCityMPG", "AverageHighwayMPG"];
-
-      const x = d3.scaleBand().domain(mpgTypes).range([margin.left, width - margin.right]).padding(0.4);
-      const y = d3.scaleLinear().domain([0, d3.max(filtered, d => Math.max(d.AverageCityMPG, d.AverageHighwayMPG))]).nice().range([height - margin.bottom, margin.top]);
-
+    
+      // Compute average
+      const averages = mpgTypes.map(mpgType => ({
+        type: mpgType,
+        value: d3.mean(filtered, d => d[mpgType])
+      }));
+    
+      const x = d3.scaleBand()
+        .domain(mpgTypes)
+        .range([margin.left, width - margin.right])
+        .padding(0.4);
+    
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(averages, d => d.value)])
+        .nice()
+        .range([height - margin.bottom, margin.top]);
+    
       svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x).tickFormat(d => d.replace("Average", "").replace("MPG", " MPG")));
-
+    
       svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
-
-      mpgTypes.forEach((mpgType, i) => {
-        const avg = d3.mean(filtered, d => d[mpgType]);
-        svg.append("rect")
-          .attr("x", x(mpgType))
-          .attr("y", y(avg))
-          .attr("width", x.bandwidth())
-          .attr("height", y(0) - y(avg))
-          .attr("fill", mpgType.includes("City") ? "teal" : "purple");
-      });
-
+    
+      svg.selectAll("rect")
+        .data(averages)
+        .join("rect")
+        .attr("x", d => x(d.type))
+        .attr("y", d => y(d.value))
+        .attr("width", x.bandwidth())
+        .attr("height", d => y(0) - y(d.value))
+        .attr("fill", d => d.type === "AverageCityMPG" ? "teal" : "purple");
+    
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", margin.top)
@@ -396,6 +412,7 @@
         .attr("class", "annotation")
         .text("City and highway MPG vary between models from the same manufacturer.");
     }
+
   </script>
 
 </body>
