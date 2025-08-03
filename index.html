@@ -238,19 +238,19 @@
     const width = 600, height = 400, margin = { top: 40, right: 40, bottom: 60, left: 60 };
     let currentScene = 1;
 
-    d3.csv("cars2017.csv", function(error, loadedData) {
-      if (error) throw error;
-
-      loadedData.forEach(function(d) {
+    d3.csv("cars2017.csv").then(function(data) {
+      data.forEach(function(d) {
         d.AverageHighwayMPG = +d.AverageHighwayMPG;
         d.AverageCityMPG = +d.AverageCityMPG;
         d.EngineCylinders = +d.EngineCylinders;
       });
-
-      data = loadedData;
-      console.log(data);
+    
+      console.log("Parsed data:", data); // Check for NaNs or missing values
+    
       populateMakeSelector();
       setScene(1);
+    }).catch(function(error) {
+      console.error("Error loading the CSV:", error);
     });
 
     function populateMakeSelector() {
