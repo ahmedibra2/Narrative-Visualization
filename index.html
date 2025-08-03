@@ -283,10 +283,10 @@
         .attr("height", height);
     
       const fuelGroups = {};
-        data.forEach(d => {
-          const fuel = d.Fuel;
-          if (!fuelGroups[fuel]) fuelGroups[fuel] = [];
-          fuelGroups[fuel].push(d);
+      data.forEach(d => {
+        const fuel = d.Fuel;
+        if (!fuelGroups[fuel]) fuelGroups[fuel] = [];
+        fuelGroups[fuel].push(d);
       });
       
       const fuels = Object.keys(fuelGroups);
