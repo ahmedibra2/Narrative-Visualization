@@ -282,8 +282,14 @@
         .attr("width", width)
         .attr("height", height);
     
-      const fuelGroups = d3.group(data, d => d.Fuel);
-      const fuels = Array.from(fuelGroups.keys());
+      const fuelGroups = {};
+        data.forEach(d => {
+          const fuel = d.Fuel;
+          if (!fuelGroups[fuel]) fuelGroups[fuel] = [];
+          fuelGroups[fuel].push(d);
+      });
+      
+      const fuels = Object.keys(fuelGroups);
     
       const summary = fuels.map(fuel => {
         const mpgs = fuelGroups.get(fuel).map(d => +d.AverageCityMPG).sort(d3.ascending);
