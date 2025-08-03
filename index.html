@@ -170,13 +170,14 @@
       // Explanation Paragraph
       svg.append("text")
         .attr("class", "annotation")
-        .attr("x", width - margin.right + 20)
+        .attr("x", width - margin.right + 5)
         .attr("y", height / 2 - 30)           
         .attr("text-anchor", "start")
         .selectAll("tspan")
         .data([
           "This chart shows that the average",
-          "miles per gallon decreases as the",
+          "miles per gallon consumption of", 
+          "vehicles decreases as the",
           "number of cylinders increases.",
           "Vehicles with zero cylinders are",
           "electric vehicles."
