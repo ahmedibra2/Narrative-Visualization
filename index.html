@@ -170,7 +170,7 @@
       // Explanation Paragraph
       svg.append("text")
         .attr("class", "annotation")
-        .attr("x", width - margin.right - 20)
+        .attr("x", width - margin.right - 50)
         .attr("y", height / 2 - 30)           
         .attr("text-anchor", "start")
         .selectAll("tspan")
@@ -183,7 +183,7 @@
           "electric vehicles."
         ])
         .join("tspan")
-        .attr("x", width - margin.right - 20)
+        .attr("x", width - margin.right - 50)
         .attr("dy", "1.2em")                 
         .text(d => d);
     
@@ -247,6 +247,27 @@
         .attr("y", 20)
         .attr("text-anchor", "middle")
         .text("Average Highway MPG");
+
+      // Explanation Paragraph
+      svg.append("text")
+        .attr("class", "annotation")
+        .attr("x", width - margin.right - 50)
+        .attr("y", height / 2 - 30)           
+        .attr("text-anchor", "start")
+        .selectAll("tspan")
+        .data([
+          "This scatter plot illustrates",
+          "the relation between average", 
+          "mile per gallon in the city",
+          "and on the highway using each",
+          "indiviudal point of the data.",
+          "Points are colored based on",
+          "their number of engine cylinders."
+        ])
+        .join("tspan")
+        .attr("x", width - margin.right - 50)
+        .attr("dy", "1.2em")                 
+        .text(d => d);
     
       svg.selectAll("circle")
         .data(data)
@@ -333,6 +354,26 @@
         .attr("y", 20)
         .attr("text-anchor", "middle")
         .text("Average MPG");
+
+      // Explanation Paragraph
+      svg.append("text")
+        .attr("class", "annotation")
+        .attr("x", width - margin.right - 50)
+        .attr("y", height / 2 - 30)           
+        .attr("text-anchor", "start")
+        .selectAll("tspan")
+        .data([
+          "This bar plot compares the",
+          "average milage per gallon", 
+          "in the city and on the highway",
+          "for each vehicle make. Use the",
+          "drop-down menu to select the",
+          "vehicle make to see its MPG."
+        ])
+        .join("tspan")
+        .attr("x", width - margin.right - 50)
+        .attr("dy", "1.2em")                 
+        .text(d => d);
     
       svg.selectAll("rect")
         .data(averages)
