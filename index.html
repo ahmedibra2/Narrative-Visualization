@@ -246,9 +246,7 @@
         d.AverageCityMPG = +d.AverageCityMPG;
         d.EngineCylinders = +d.EngineCylinders;
       });
-    
-      console.log("Parsed data:", data);
-    
+        
       populateMakeSelector();
       setScene(1);
     }).catch(function(error) {
@@ -282,15 +280,12 @@
         .attr("width", width)
         .attr("height", height);
     
-      const fuelGroups = {};
-      data.forEach(d => {
-        const fuel = d.Fuel;
-        if (!fuelGroups[fuel]) fuelGroups[fuel] = [];
-        fuelGroups[fuel].push(d);
-      });
-      
-      const fuels = Object.keys(fuelGroups);
-    
+      const fuelGroups = d3.group(data, d => d.Fuel);
+      const fuels = Array.from(fuelGroups.keys());
+
+      console.log(fuelGroups);
+      console.log(fuels);
+        
       const summary = fuels.map(fuel => {
         const mpgs = fuelGroups.get(fuel).map(d => +d.AverageCityMPG).sort(d3.ascending);
         const q1 = d3.quantile(mpgs, 0.25);
