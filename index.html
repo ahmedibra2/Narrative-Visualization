@@ -274,92 +274,93 @@
       else if (sceneNumber === 3) drawScene3();
     }
     
-    function drawScene1(data) {
-
-      const mpgByCyl = d3.rollups(
-        filteredData,
+    function drawScene1() {
+      
+      const grouped = d3.rollups(
+        data.filter(d => !isNaN(d.EngineCylinders)),
         v => ({
-          city: d3.mean(v, d => d.AverageCityMPG),
-          highway: d3.mean(v, d => d.AverageHighwayMPG)
+          avgCity: d3.mean(v, d => d.AverageCityMPG),
+          avgHighway: d3.mean(v, d => d.AverageHighwayMPG)
         }),
         d => d.EngineCylinders
       );
     
-      mpgByCyl.sort((a, b) => a[0] - b[0]);
+      grouped.sort((a, b) => a[0] - b[0]);
     
-      const chartData = [];
-      mpgByCyl.forEach(([cyl, mpg]) => {
-        chartData.push({ cyl, type: "City MPG", value: mpg.city });
-        chartData.push({ cyl, type: "Highway MPG", value: mpg.highway });
-      });
+      const engineGroups = grouped.map(d => d[0]);
+      const avgCity = grouped.map(d => d[1].avgCity);
+      const avgHighway = grouped.map(d => d[1].avgHighway);
+    
+      const svg = d3.select("#vis")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
     
       const x0 = d3.scaleBand()
-        .domain([...new Set(chartData.map(d => d.cyl))])
+        .domain(engineGroups)
         .range([margin.left, width - margin.right])
         .paddingInner(0.2);
     
       const x1 = d3.scaleBand()
-        .domain(["City MPG", "Highway MPG"])
+        .domain(["City", "Highway"])
         .range([0, x0.bandwidth()])
         .padding(0.1);
     
       const y = d3.scaleLinear()
-        .domain([0, d3.max(chartData, d => d.value)]).nice()
+        .domain([0, d3.max([...avgCity, ...avgHighway])])
+        .nice()
         .range([height - margin.bottom, margin.top]);
     
       const color = d3.scaleOrdinal()
-        .domain(["City MPG", "Highway MPG"])
-        .range(["steelblue", "orange"]);
+        .domain(["City", "Highway"])
+        .range(["#1f77b4", "#ff7f0e"]);
+    
+      const bars = svg.append("g");
+    
+      bars.selectAll("g")
+        .data(grouped)
+        .join("g")
+        .attr("transform", d => `translate(${x0(d[0])},0)`)
+        .selectAll("rect")
+        .data(d => [
+          { type: "City", value: d[1].avgCity },
+          { type: "Highway", value: d[1].avgHighway }
+        ])
+        .join("rect")
+        .attr("x", d => x1(d.type))
+        .attr("y", d => y(d.value))
+        .attr("width", x1.bandwidth())
+        .attr("height", d => y(0) - y(d.value))
+        .attr("fill", d => color(d.type));
     
       svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x0).tickSizeOuter(0))
-        .append("text")
-        .attr("x", (width - margin.left - margin.right) / 2 + margin.left)
-        .attr("y", 40)
-        .attr("fill", "black")
-        .attr("text-anchor", "middle")
-        .text("Number of Cylinders");
+        .call(d3.axisBottom(x0).tickFormat(d => `${d} cyl`));
     
       svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y))
-        .append("text")
-        .attr("x", -margin.left + 10)
-        .attr("y", margin.top - 20)
-        .attr("fill", "black")
-        .attr("text-anchor", "start")
-        .text("Miles per Gallon (MPG)");
+        .call(d3.axisLeft(y).ticks(10));
     
-      svg.append("g")
-        .selectAll("g")
-        .data(d3.group(chartData, d => d.cyl))
-        .join("g")
-          .attr("transform", d => `translate(${x0(d[0])},0)`)
-        .selectAll("rect")
-        .data(d => d[1])
-        .join("rect")
-          .attr("x", d => x1(d.type))
-          .attr("y", d => y(d.value))
-          .attr("width", x1.bandwidth())
-          .attr("height", d => y(0) - y(d.value))
-          .attr("fill", d => color(d.type));
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", margin.top / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Average MPG by Engine Cylinders");
     
       const legend = svg.append("g")
-        .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`);
+        .attr("transform", `translate(${width - margin.right + 20},${margin.top})`);
     
-      ["City MPG", "Highway MPG"].forEach((type, i) => {
-        const legendRow = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
-        legendRow.append("rect")
+      ["City", "Highway"].forEach((key, i) => {
+        const g = legend.append("g").attr("transform", `translate(0,${i * 25})`);
+        g.append("rect")
           .attr("width", 15)
           .attr("height", 15)
-          .attr("fill", color(type));
-        legendRow.append("text")
+          .attr("fill", color(key));
+        g.append("text")
           .attr("x", 20)
           .attr("y", 12)
-          .text(type)
-          .attr("font-size", "12px")
-          .attr("alignment-baseline", "middle");
+          .text(key + " MPG");
       });
     }
 
