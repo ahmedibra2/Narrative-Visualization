@@ -245,18 +245,11 @@
         .attr("font-size", "20px")
         .text("City vs Highway MPG colored by engine cylinder count.");
     
-      // svg.append("text")
-      //   .attr("x", width / 2)
-      //   .attr("y", margin.top)
-      //   .attr("text-anchor", "middle")
-      //   .attr("class", "annotation")
-      //   .text("City vs Highway MPG colored by engine cylinder count.");
-    
       const legend = svg.selectAll(".legend")
         .data(uniqueCylinders)
         .join("g")
         .attr("class", "legend")
-        .attr("transform", (d, i) => `translate(0,${margin.top + i * 20})`);
+        .attr("transform", (d, i) => `translate(0,${height - margin.bottom - uniqueCylinders.length * 20 + i * 20})`);
     
       legend.append("rect")
         .attr("x", width - margin.right + 10)
@@ -266,7 +259,7 @@
     
       legend.append("text")
         .attr("x", width - margin.right)
-        .attr("y", 6)
+        .attr("y", 10)
         .attr("dy", "0.35em")
         .attr("text-anchor", "end")
         .text(d => `${d} cylinders`);
@@ -337,13 +330,7 @@
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .text("City and highway MPG vary between models from the same manufacturer.");
-    
-      // svg.append("text")
-      //   .attr("x", width / 2)
-      //   .attr("y", margin.top)
-      //   .attr("text-anchor", "middle")
-      //   .attr("class", "annotation")
-      //   .text("City and highway MPG vary between models from the same manufacturer.");
+      
     }
 
   </script>
