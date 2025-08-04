@@ -264,7 +264,7 @@
         .attr("x", -height / 2)
         .attr("y", 20)
         .attr("text-anchor", "middle")
-        .text("Relationship between Average MPG in the City and on the Highway for each Vehicle");
+        .text("Average Highway MPG");
 
       // Explanation Paragraph
       svg.append("text")
@@ -316,7 +316,7 @@
         .attr("y", margin.top / 2)
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .text("City vs Highway MPG colored by engine cylinder count.");
+        .text("Relationship of City vs Highway MPG");
     
       const legend = svg.selectAll(".legend")
         .data(uniqueCylinders)
@@ -385,7 +385,7 @@
         .attr("x", -height / 2)
         .attr("y", 20)
         .attr("text-anchor", "middle")
-        .text("Average MPG based on Vehicle Make");
+        .text("Average MPG");
 
       // Explanation Paragraph
       svg.append("text")
@@ -441,7 +441,7 @@
         .attr("y", margin.top / 2)
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .text("City and highway MPG vary between models from the same manufacturer.");
+        .text("Average MPG based on Vehicle Make");
       
     }
 
