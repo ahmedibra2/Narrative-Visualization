@@ -270,7 +270,7 @@
       svg.append("text")
         .attr("class", "annotation")
         .attr("x", width - margin.right - 50)
-        .attr("y", height / 2 - 100)           
+        .attr("y", height / 2 - 190)           
         .attr("text-anchor", "start")
         .selectAll("tspan")
         .data([
@@ -282,7 +282,7 @@
           "Points are colored based on",
           "their number of engine cylinders.",
           " ",
-          "Hover over each bar to observe",
+          "Hover over each point to observe",
           "eact values."
         ])
         .join("tspan")
