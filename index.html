@@ -35,11 +35,15 @@
   <select id="makeSelector" style="display:none;" onchange="updateScene3()"></select>
 
   <div id="vis"></div>
+  <div id="tooltip" style="position: absolute; visibility: hidden; padding: 8px; background: #333; color: white; border-radius: 4px; font-size: 12px;"></div>
+
 
   <script>
     let data = [];
     const width = 1000, height = 600, margin = { top: 50, right: 180, bottom: 80, left: 80 };
     let currentScene = 1;
+    const tooltip = d3.select("#tooltip");
+
 
     d3.csv("cars2017.csv").then(function(loadedData) {
       data = loadedData;
@@ -276,7 +280,18 @@
         .attr("cy", d => y(d.AverageHighwayMPG))
         .attr("r", 5)
         .attr("fill", d => color(d.EngineCylinders))
-        .attr("opacity", 0.7);
+        .attr("opacity", 0.7)
+        .on("mouseover", (event, d) => { // Tooltip
+          tooltip.style("visibility", "visible")
+                 .html(`City MPG: ${d.AverageCityMPG}<br>Highway MPG: ${d.AverageHighwayMPG}`);
+        })
+        .on("mousemove", event => {
+          tooltip.style("top", (event.pageY - 10) + "px")
+                 .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.style("visibility", "hidden");
+        });
 
       // Title
       svg.append("text")
@@ -382,7 +397,19 @@
         .attr("y", d => y(d.value))
         .attr("width", x.bandwidth())
         .attr("height", d => y(0) - y(d.value))
-        .attr("fill", d => d.type === "AverageCityMPG" ? "teal" : "purple");
+        .attr("fill", d => d.type === "AverageCityMPG" ? "teal" : "purple")
+        .on("mouseover", (event, d) => { // Tooltip
+            const label = d.type === "AverageCityMPG" ? "City MPG" : "Highway MPG";
+            tooltip.style("visibility", "visible")
+                   .text(`${label}: ${d.value.toFixed(1)}`);
+          })
+          .on("mousemove", event => {
+            tooltip.style("top", (event.pageY - 10) + "px")
+                   .style("left", (event.pageX + 10) + "px");
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+        });
 
       // Title
       svg.append("text")
