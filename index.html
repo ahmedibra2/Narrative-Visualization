@@ -138,7 +138,18 @@
         .attr("y", d => y(d.value))
         .attr("width", x1.bandwidth())
         .attr("height", d => y(0) - y(d.value))
-        .attr("fill", d => color(d.type));
+        .attr("fill", d => color(d.type))
+        .on("mouseover", (event, d) => { // Tooltip
+            tooltip.style("visibility", "visible")
+                   .text(`${d.type} MPG: ${d.value.toFixed(1)}`);
+          })
+          .on("mousemove", event => {
+            tooltip.style("top", (event.pageY - 10) + "px")
+                   .style("left", (event.pageX + 10) + "px");
+          })
+          .on("mouseout", () => {
+            tooltip.style("visibility", "hidden");
+          });
     
       svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
